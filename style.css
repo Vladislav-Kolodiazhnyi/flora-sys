@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f8fafc;
+}
+
+.nav-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    color: #4b5563;
+}
+.nav-btn:hover {
+    background-color: #f3f4f6;
+}
+.active-nav-btn {
+    background-color: #fdf2f8;
+    color: #db2777;
+}
+
+.cart-btn {
+    padding: 0.5rem 1rem;
+    background-color: #111827;
+    color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+}
+.cart-btn:hover {
+    background-color: #1f2937;
+}
+
+.filter-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    border: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background-color: white;
+    color: #4b5563;
+    transition: all 0.2s ease;
+}
+.filter-btn:hover {
+    border-color: #ec4899;
+}
+.active-filter {
+    background-color: #ec4899 !important;
+    color: white !important;
+    border-color: #ec4899 !important;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-field:focus {
+    border-color: #ec4899;
+    box-shadow: 0 0 0 1px #ec4899;
+}
+
+.btn-primary {
+    background-color: #ec4899;
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.2);
+}
+.btn-primary:hover {
+    background-color: #be185d;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #db2777;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #be185d;
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flora Delivery | Система управління</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="text-gray-800 flex flex-col min-h-screen">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-[70] space-y-3 pointer-events-none"></div>
+
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100 transition-all">
+        <div class="container mx-auto px-4 md:px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 cursor-pointer group" onclick="app.switchView('shop')">
+                <div class="bg-pink-100 p-2 rounded-full group-hover:bg-pink-200 transition">
+                    <i class="fa-solid fa-seedling text-pink-600 text-xl"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight">Flora<span class="text-pink-600">Sys</span></span>
+            </div>
+            
+            <div class="flex flex-wrap justify-center items-center gap-2 text-sm font-medium">
+                <button onclick="app.switchView('shop')" id="btn-shop" class="nav-btn active-nav-btn">
+                    <i class="fa-solid fa-store mr-1"></i> Магазин
+                </button>
+                <button onclick="app.checkAuth('delivery')" id="btn-delivery" class="nav-btn">
+                    <i class="fa-solid fa-truck-fast mr-1"></i> Логістика
+                </button>
+                <button onclick="app.checkAuth('admin')" id="btn-admin" class="nav-btn">
+                    <i class="fa-solid fa-box-open mr-1"></i> Склад
+                </button>
+                
+                <div class="h-6 w-px bg-gray-300 mx-2"></div>
+
+                <button onclick="app.toggleCart()" class="cart-btn relative">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
+                </button>
+
+                <button id="btn-logout" onclick="app.logout()" class="hidden ml-2 text-red-500 hover:text-red-700 px-3 py-2 border border-red-100 rounded-lg hover:bg-red-50 transition" title="Вийти">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 md:px-6 py-8 flex-1">
+        
+        <div id="view-shop" class="fade-in">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 max-w-4xl mx-auto flex flex-col md:flex-row gap-4 items-center">
+                <div class="relative flex-1 w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-gray-400"></i>
+                    <input type="text" oninput="app.updateSearch(this.value)" placeholder="Я шукаю..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition bg-gray-50/50">
+                </div>
+                <div class="w-full md:w-48">
+                    <select onchange="app.updateSort(this.value)" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-500 bg-gray-50/50 cursor-pointer">
+                        <option value="default">Сортування</option>
+                        <option value="price-asc">Ціна: від низької</option>
+                        <option value="price-desc">Ціна: від високої</option>
+                        <option value="name-asc">Назва: А-Я</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 mb-10">
+                <button onclick="app.filterProducts('all')" class="filter-btn active-filter">Всі</button>
+                <button onclick="app.filterProducts('Троянди')" class="filter-btn">Троянди</button>
+                <button onclick="app.filterProducts('Тюльпани')" class="filter-btn">Тюльпани</button>
+                <button onclick="app.filterProducts('Композиції')" class="filter-btn">Композиції</button>
+                <button onclick="app.filterProducts('Інше')" class="filter-btn">Інше</button>
+            </div>
+
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+            
+            <div id="empty-shop-msg" class="hidden text-center text-gray-400 py-20">
+                <div class="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-magnifying-glass text-3xl text-gray-300"></i>
+                </div>
+                <p class="font-medium">Нічого не знайдено за вашим запитом</p>
+            </div>
+        </div>
+
+        <div id="view-delivery" class="hidden fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">Центр керування доставкою</h2>
+                        <span class="inline-block mt-1 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold">ADMIN ACCESS</span>
+                    </div>
+                    <button onclick="app.refreshData()" class="text-blue-500 hover:text-blue-700 text-sm font-semibold"><i class="fa-solid fa-rotate-right"></i> Оновити</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-100/50 text-gray-500 uppercase text-xs font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-4">ID</th>
+                                <th class="p-4">Клієнт</th>
+                                <th class="p-4">Сума</th>
+                                <th class="p-4">Час</th>
+                                <th class="p-4">Статус</th>
+                                <th class="p-4 text-center">Деталі</th>
+                                <th class="p-4 text-right">Управління</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body" class="text-sm divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+                <div id="no-orders-msg" class="p-12 text-center text-gray-400 hidden">
+                    <p>Замовлень поки немає</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-admin" class="hidden fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                    <h3 class="font-bold text-lg mb-4 text-gray-800">Додати товар</h3>
+                    <form id="add-product-form" onsubmit="event.preventDefault(); app.addNewProduct();" class="space-y-4">
+                        <input type="text" id="new-prod-name" required class="input-field" placeholder="Назва товару">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" id="new-prod-price" required min="1" class="input-field" placeholder="Ціна">
+                            <select id="new-prod-cat" class="input-field bg-white">
+                                <option value="Троянди">Троянди</option>
+                                <option value="Тюльпани">Тюльпани</option>
+                                <option value="Композиції">Композиції</option>
+                                <option value="Інше">Інше</option>
+                            </select>
+                        </div>
+                        <input type="url" id="new-prod-img" class="input-field" placeholder="URL Картинки (необов'язково)">
+                        <button type="submit" class="btn-primary w-full">Додати</button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg mb-4 text-gray-800">Каталог товарів</h3>
+                    <div class="overflow-y-auto max-h-[500px]">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase sticky top-0">
+                                <tr>
+                                    <th class="p-3">Фото</th>
+                                    <th class="p-3">Назва</th>
+                                    <th class="p-3">Ціна</th>
+                                    <th class="p-3 text-right">Дія</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-products-list" class="divide-y divide-gray-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="login-modal" class="modal hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center fade-in">
+            <div class="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-lock text-2xl text-pink-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Вхід в систему</h3>
+            <p class="text-gray-500 text-sm mb-6">Доступ тільки для адміністраторів</p>
+            <form onsubmit="event.preventDefault(); app.performLogin();">
+                <input type="password" id="login-password" class="input-field mb-2" placeholder="Пароль">
+                <p class="text-xs text-gray-400 mb-4">(Пароль: admin)</p>
+                <button type="submit" class="btn-primary w-full mb-3">Увійти</button>
+                <button type="button" onclick="document.getElementById('login-modal').classList.add('hidden')" class="text-sm text-gray-400 hover:text-gray-600">Скасувати</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cart-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-50 flex justify-end">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl flex flex-col fade-in">
+            <div class="p-5 border-b flex justify-between items-center bg-gray-50">
+                <h2 class="text-lg font-bold">Кошик</h2>
+                <button onclick="app.toggleCart()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+            <div class="p-6 border-t bg-white">
+                <div class="flex justify-between text-xl font-bold mb-6"><span>Разом:</span><span id="cart-total" class="text-pink-600">0 ₴</span></div>
+                <input type="text" id="cust-name" placeholder="Ім'я" class="input-field mb-2">
+                <input type="text" id="cust-addr" placeholder="Адреса" class="input-field mb-4">
+                <button onclick="app.checkout()" class="btn-primary w-full">Замовити</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="order-details-modal" class="modal hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden fade-in">
+            <div class="bg-gray-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold">Деталі</h3>
+                <button onclick="document.getElementById('order-details-modal').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6" id="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
